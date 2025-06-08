@@ -1,0 +1,204 @@
+1 . SELECT CustomerID, PersonID, StoreID, TerritoryID 
+     FROM Sales.Customer; 
+2.  SELECT c.CustomerID, s.Name AS CompanyName 
+FROM Sales.Customer c 
+JOIN Sales.Store s ON c.StoreID = s.BusinessEntityID 
+WHERE s.Name LIKE '%N'; 
+3.	SELECT a.AddressID, a.AddressLine1, a.City, sp.Name AS StateProvince 
+FROM Person.Address a 
+JOIN Person.StateProvince sp ON a.StateProvinceID = sp.StateProvinceID; 
+4.	SELECT c.CustomerID, p.FirstName, p.LastName, a.AddressLine1, a.City, sp.Name AS State 
+FROM Sales.Customer c 
+JOIN Person.Person p ON c.PersonID = p.BusinessEntityID 
+JOIN Sales.CustomerAddress ca ON c.CustomerID = ca.CustomerID 
+JOIN Person.Address a ON ca.AddressID = a.AddressID 
+JOIN Person.StateProvince sp ON a.StateProvinceID = sp.StateProvinceID; 
+5.	SELECT p.Name AS ProductName, ps.Name AS Subcategory, pc.Name AS Category 
+FROM Production.Product p 
+JOIN Production.ProductSubcategory ps ON p.ProductSubcategoryID = ps.ProductSubcategoryID 
+JOIN Production.ProductCategory pc ON ps.ProductCategoryID = pc.ProductCategoryID; 
+6.	SELECT sp.BusinessEntityID, p.FirstName, p.LastName, SUM(soh.TotalDue) AS TotalSales 
+FROM Sales.SalesPerson sp 
+JOIN HumanResources.Employee e ON sp.BusinessEntityID = e.BusinessEntityID 
+JOIN Person.Person p ON e.BusinessEntityID = p.BusinessEntityID 
+JOIN Sales.SalesOrderHeader soh ON sp.BusinessEntityID = soh.SalesPersonID 
+GROUP BY sp.BusinessEntityID, p.FirstName, p.LastName; 
+7.	SELECT TOP 5 p.Name, SUM(sod.OrderQty) AS TotalSold FROM Sales.SalesOrderDetail sod 
+JOIN Production.Product p ON sod.ProductID = p.ProductID 
+GROUP BY p.Name 
+ORDER BY TotalSold DESC; 
+8.	SELECT CustomerID, COUNT(SalesOrderID) AS OrderCount 
+FROM Sales.SalesOrderHeader 
+GROUP BY CustomerID; 
+9.	SELECT c.CustomerID, p.FirstName, p.LastName 
+FROM Sales.Customer c 
+JOIN Person.Person p ON c.PersonID = p.BusinessEntityID 
+LEFT JOIN Sales.SalesOrderHeader soh ON c.CustomerID = soh.CustomerID 
+WHERE soh.CustomerID IS NULL; 
+10.	SELECT p.FirstName, p.LastName, d.Name AS Department 
+FROM HumanResources.Employee e 
+JOIN HumanResources.EmployeeDepartmentHistory edh ON e.BusinessEntityID = edh.BusinessEntityID 
+JOIN HumanResources.Department d ON edh.DepartmentID = d.DepartmentID 
+JOIN Person.Person p ON e.BusinessEntityID = p.BusinessEntityID 
+WHERE edh.EndDate IS NULL; 
+11.	SELECT p.FirstName, p.LastName, e.JobTitle 
+FROM HumanResources.Employee e 
+JOIN Person.Person p ON e.BusinessEntityID = p.BusinessEntityID; 
+12.	SELECT v.Name AS VendorName, p.FirstName, p.LastName, pp.PhoneNumber, ea.EmailAddress 
+FROM Purchasing.Vendor v 
+JOIN Person.BusinessEntityContact bec ON v.BusinessEntityID = bec.BusinessEntityID 
+JOIN Person.Person p ON bec.PersonID = p.BusinessEntityID 
+LEFT JOIN Person.EmailAddress ea ON p.BusinessEntityID = ea.BusinessEntityID 
+LEFT JOIN Person.PersonPhone pp ON p.BusinessEntityID = pp.BusinessEntityID; 
+13.	SELECT v.Name AS VendorName, p.Name AS ProductName 
+FROM Purchasing.ProductVendor pv 
+JOIN Purchasing.Vendor v ON pv.BusinessEntityID = v.BusinessEntityID 
+JOIN Production.Product p ON pv.ProductID = p.ProductID; 
+14.	SELECT po.PurchaseOrderID, v.Name AS VendorName, po.TotalDue 
+FROM Purchasing.PurchaseOrderHeader po 
+JOIN Purchasing.Vendor v ON po.VendorID = v.BusinessEntityID; 
+15.	SELECT p.ProductID, p.Name 
+FROM Production.Product p 
+LEFT JOIN Sales.SalesOrderDetail sod ON p.ProductID = sod.ProductID 
+WHERE sod.ProductID IS NULL; 
+16.	SELECT pc.Name AS Category, COUNT(p.ProductID) AS TotalProducts 
+FROM Production.Product p 
+JOIN Production.ProductSubcategory ps ON p.ProductSubcategoryID = ps.ProductSubcategoryID 
+JOIN Production.ProductCategory pc ON ps.ProductCategoryID = pc.ProductCategoryID 
+GROUP BY pc.Name; 
+17.	SELECT SalesOrderID, OrderDate, CustomerID, TotalDue 
+FROM Sales.SalesOrderHeader 
+WHERE YEAR(OrderDate) = 2013; 
+18.	SELECT c.CustomerID, p.FirstName, p.LastName, SUM(soh.TotalDue) AS TotalOrderValue 
+FROM Sales.Customer c 
+JOIN Person.Person p ON c.PersonID = p.BusinessEntityID 
+JOIN Sales.SalesOrderHeader soh ON c.CustomerID = soh.CustomerID 
+GROUP BY c.CustomerID, p.FirstName, p.LastName; 
+19.	SELECT TOP 3 c.CustomerID, p.FirstName, p.LastName, SUM(soh.TotalDue) AS TotalOrderValue 
+FROM Sales.Customer c 
+JOIN Person.Person p ON c.PersonID = p.BusinessEntityID 
+JOIN Sales.SalesOrderHeader soh ON c.CustomerID = soh.CustomerID 
+GROUP BY c.CustomerID, p.FirstName, p.LastName 
+ORDER BY TotalOrderValue DESC; 
+20.	SELECT c.CustomerID, p.FirstName, p.LastName, AVG(soh.TotalDue) AS AvgOrderValue 
+FROM Sales.Customer c 
+JOIN Person.Person p ON c.PersonID = p.BusinessEntityID 
+JOIN Sales.SalesOrderHeader soh ON c.CustomerID = soh.CustomerID 
+GROUP BY c.CustomerID, p.FirstName, p.LastName; 
+21.	SELECT DISTINCT e.BusinessEntityID, p.FirstName, p.LastName FROM Sales.SalesOrderHeader soh 
+JOIN Sales.SalesPerson sp ON soh.SalesPersonID = sp.BusinessEntityID 
+JOIN HumanResources.Employee e ON sp.BusinessEntityID = e.BusinessEntityID 
+JOIN Person.Person p ON e.BusinessEntityID = p.BusinessEntityID; 
+22.	SELECT e.BusinessEntityID, p.FirstName, p.LastName 
+FROM HumanResources.Employee e 
+JOIN Person.Person p ON e.BusinessEntityID = p.BusinessEntityID 
+WHERE e.BusinessEntityID NOT IN ( 
+    SELECT SalesPersonID FROM Sales.SalesOrderHeader WHERE SalesPersonID IS NOT NULL 
+); 
+23.	SELECT CustomerID, COUNT(*) AS OrderCount 
+FROM Sales.SalesOrderHeader 
+GROUP BY CustomerID 
+HAVING COUNT(*) > 5; 
+24.	SELECT CustomerID, COUNT(*) AS OrderCount 
+FROM Sales.SalesOrderHeader 
+GROUP BY CustomerID 
+HAVING COUNT(*) = 1; 
+25.	SELECT TOP 1 c.CustomerID, p.FirstName, p.LastName, SUM(soh.TotalDue) AS TotalPurchase 
+FROM Sales.Customer c 
+JOIN Person.Person p ON c.PersonID = p.BusinessEntityID 
+JOIN Sales.SalesOrderHeader soh ON c.CustomerID = soh.CustomerID 
+GROUP BY c.CustomerID, p.FirstName, p.LastName 
+ORDER BY TotalPurchase DESC; 
+26.	SELECT p.Name, SUM(sod.OrderQty) AS TotalSold 
+FROM Sales.SalesOrderDetail sod 
+JOIN Production.Product p ON sod.ProductID = p.ProductID 
+GROUP BY p.Name 
+HAVING SUM(sod.OrderQty) > 100; 
+27.	SELECT p.ProductID, p.Name 
+FROM Production.Product p 
+LEFT JOIN Sales.SalesOrderDetail sod ON p.ProductID = sod.ProductID 
+WHERE sod.ProductID IS NULL; 
+28.	SELECT TOP 3 pc.Name AS Category, SUM(sod.OrderQty) AS TotalQuantitySold 
+FROM Sales.SalesOrderDetail sod 
+JOIN Production.Product p ON sod.ProductID = p.ProductID 
+JOIN Production.ProductSubcategory ps ON p.ProductSubcategoryID = ps.ProductSubcategoryID 
+JOIN Production.ProductCategory pc ON ps.ProductCategoryID = pc.ProductCategoryID 
+GROUP BY pc.Name 
+ORDER BY TotalQuantitySold DESC; 
+29.	SELECT YEAR(OrderDate) AS OrderYear, MONTH(OrderDate) AS OrderMonth, SUM(TotalDue) AS MonthlySales 
+FROM Sales.SalesOrderHeader 
+GROUP BY YEAR(OrderDate), MONTH(OrderDate) 
+ORDER BY OrderYear, OrderMonth; 
+30.	SELECT YEAR(OrderDate) AS OrderYear, SUM(TotalDue) AS YearlySales 
+FROM Sales.SalesOrderHeader 
+GROUP BY YEAR(OrderDate) 
+ORDER BY OrderYear; 
+31.	SELECT d.Name AS DepartmentName, COUNT(DISTINCT edh.BusinessEntityID) AS EmployeeCount 
+FROM HumanResources.EmployeeDepartmentHistory edh 
+JOIN HumanResources.Department d ON edh.DepartmentID = d.DepartmentID 
+WHERE edh.EndDate IS NULL 
+GROUP BY d.Name; 
+32.	SELECT e.JobTitle, COUNT(*) AS EmployeeCount 
+FROM HumanResources.Employee e 
+GROUP BY e.JobTitle; 
+33.	SELECT CustomerID, YEAR(OrderDate) AS OrderYear, COUNT(SalesOrderID) AS OrderCount 
+FROM Sales.SalesOrderHeader 
+GROUP BY CustomerID, YEAR(OrderDate) 
+ORDER BY CustomerID, OrderYear; 
+34.	SELECT ps.Name AS Subcategory, COUNT(p.ProductID) AS ProductCount 
+FROM Production.Product p 
+JOIN Production.ProductSubcategory ps ON p.ProductSubcategoryID = ps.ProductSubcategoryID 
+GROUP BY ps.Name; 
+35.	SELECT pc.Name AS Category, p.Name AS ProductName, p.ListPrice 
+FROM Production.Product p 
+JOIN Production.ProductSubcategory ps ON p.ProductSubcategoryID = ps.ProductSubcategoryID 
+JOIN Production.ProductCategory pc ON ps.ProductCategoryID = pc.ProductCategoryID 
+WHERE p.ListPrice = ( 
+    SELECT MAX(p2.ListPrice) 
+    FROM Production.Product p2 
+    JOIN Production.ProductSubcategory ps2 ON p2.ProductSubcategoryID = ps2.ProductSubcategoryID 
+    WHERE ps2.ProductCategoryID = pc.ProductCategoryID 
+); 
+36.	SELECT DISTINCT c.CustomerID, p2.FirstName, p2.LastName 
+FROM Sales.SalesOrderDetail sod 
+JOIN Sales.SalesOrderHeader soh ON sod.SalesOrderID = soh.SalesOrderID 
+JOIN Sales.Customer c ON soh.CustomerID = c.CustomerID 
+JOIN Person.Person p2 ON c.PersonID = p2.BusinessEntityID 
+JOIN Production.Product p ON sod.ProductID = p.ProductID 
+WHERE p.Name = 'Mountain-100 Black, 42'; 
+37.	SELECT DISTINCT sp.BusinessEntityID AS SalesPersonID, per.FirstName, per.LastName, prod.Name AS ProductName 
+FROM Sales.SalesOrderHeader soh 
+JOIN Sales.SalesOrderDetail sod ON soh.SalesOrderID = sod.SalesOrderID 
+JOIN Sales.SalesPerson sp ON soh.SalesPersonID = sp.BusinessEntityID 
+JOIN Person.Person per ON sp.BusinessEntityID = per.BusinessEntityID 
+JOIN Production.Product prod ON sod.ProductID = prod.ProductID; 
+38.	SELECT sp.BusinessEntityID AS SalesPersonID, per.FirstName, per.LastName, 
+       YEAR(soh.OrderDate) AS OrderYear, SUM(soh.TotalDue) AS TotalSales 
+FROM Sales.SalesOrderHeader soh 
+JOIN Sales.SalesPerson sp ON soh.SalesPersonID = sp.BusinessEntityID 
+JOIN Person.Person per ON sp.BusinessEntityID = per.BusinessEntityID 
+GROUP BY sp.BusinessEntityID, per.FirstName, per.LastName, YEAR(soh.OrderDate) 
+ORDER BY sp.BusinessEntityID, OrderYear; 
+39.	SELECT p.Name AS ProductName, AVG(sod.LineTotal) AS AvgOrderValue 
+FROM Sales.SalesOrderDetail sod 
+JOIN Production.Product p ON sod.ProductID = p.ProductID 
+GROUP BY p.Name; 
+40.	SELECT CustomerID 
+FROM ( 
+    SELECT CustomerID, YEAR(OrderDate) AS OrderYear 
+    FROM Sales.SalesOrderHeader 
+    WHERE YEAR(OrderDate) IN (2011, 2012, 2013) 
+    GROUP BY CustomerID, YEAR(OrderDate) 
+) AS Orders 
+GROUP BY CustomerID 
+HAVING COUNT(DISTINCT OrderYear) = 3; 
+41.	SELECT c.CustomerID, p.FirstName, p.LastName FROM Sales.Customer c 
+JOIN Person.Person p ON c.PersonID = p.BusinessEntityID 
+LEFT JOIN Sales.SalesOrderHeader soh ON c.CustomerID = soh.CustomerID 
+GROUP BY c.CustomerID, p.FirstName, p.LastName 
+HAVING MAX(soh.OrderDate) < '2013-01-01' OR MAX(soh.OrderDate) IS NULL; 
+42.	SELECT Name, ListPrice 
+FROM Production.Product 
+WHERE ListPrice > ( 
+    SELECT AVG(ListPrice) FROM Production.Product WHERE ListPrice > 0 
+); 
